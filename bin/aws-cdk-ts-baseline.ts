@@ -2,6 +2,7 @@
 import 'source-map-support/register';
 import * as cdk from '@aws-cdk/core';
 import { AwsCdkTsBaselineStack } from '../lib/aws-cdk-ts-baseline-stack';
+import config from '../config/config';
 
 const app = new cdk.App();
 new AwsCdkTsBaselineStack(app, 'AwsCdkTsBaselineStack', {
@@ -15,7 +16,7 @@ new AwsCdkTsBaselineStack(app, 'AwsCdkTsBaselineStack', {
 
   /* Uncomment the next line if you know exactly what Account and Region you
    * want to deploy the stack to. */
-  // env: { account: '123456789012', region: 'us-east-1' },
+  env: { account: config.ACCOUNT, region: config.REGION },
 
   /* For more information, see https://docs.aws.amazon.com/cdk/latest/guide/environments.html */
 });
