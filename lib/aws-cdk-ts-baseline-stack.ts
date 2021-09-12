@@ -1,9 +1,13 @@
 import * as cdk from "@aws-cdk/core";
+import { VpcStack } from "./vpc-stack";
 
 export class AwsCdkTsBaselineStack extends cdk.Stack {
     constructor(scope: cdk.Construct, id: string, props?: cdk.StackProps) {
         super(scope, id, props);
 
-        // The code that defines your stack goes here
+        // Create VPC stack.
+        new VpcStack(this, "VpcStack", {
+            env: props?.env,
+        });
     }
 }
