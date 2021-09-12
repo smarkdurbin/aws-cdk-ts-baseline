@@ -31,6 +31,7 @@ export class RdsStack extends cdk.Stack {
      */
     addSubnetGroup(name: string, subnetType: SubnetType, description?: string) {
         const subnetGroup = new SubnetGroup(this, name + "SubnetGroup", {
+            subnetGroupName: name,
             description: "",
             vpc: this.vpcStack.vpc,
             vpcSubnets: {
