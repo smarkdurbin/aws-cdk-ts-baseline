@@ -1,9 +1,16 @@
 import * as cdk from "@aws-cdk/core";
-import { Peer, Port, SecurityGroup, SubnetType, Vpc } from "@aws-cdk/aws-ec2";
+import {
+    IPeer,
+    Peer,
+    Port,
+    SecurityGroup,
+    SubnetType,
+    Vpc,
+} from "@aws-cdk/aws-ec2";
 
 export class VpcStack extends cdk.Stack {
     public readonly vpc: Vpc;
-    public readonly security_groups: { [key: string]: SecurityGroup };
+    public readonly securityGroups: { [key: string]: SecurityGroup };
 
     constructor(scope: cdk.Construct, id: string, props?: cdk.StackProps) {
         super(scope, id, props);
@@ -24,6 +31,12 @@ export class VpcStack extends cdk.Stack {
                 },
                 {
                     cidrMask: 24,
+                    name: "Reserved",
+                    reserved: true,
+                    subnetType: SubnetType.PRIVATE_ISOLATED,
+                },
+                {
+                    cidrMask: 24,
                     name: "Private",
                     subnetType: SubnetType.PRIVATE_ISOLATED,
                 },
@@ -35,38 +48,49 @@ export class VpcStack extends cdk.Stack {
             ],
         });
 
-        // Create web server secruity group.
-        new SecurityGroup(this, "WebserverSecurityGroup", {
+        // Define security groups.
+        this.securityGroups = {
+            WEBSERVER: this.createSecurityGroup("WebServer", [
+                {
+                    peer: Peer.anyIpv4(),
+                    port: Port.tcp(80),
+                    description: "HTTP",
+                },
+                {
+                    peer: Peer.anyIpv4(),
+                    port: Port.tcp(443),
+                    description: "HTTPS",
+                },
+            ]),
+            MYSQL: this.createSecurityGroup("MySqlServer", [
+                {
+                    peer: Peer.ipv4(cidr),
+                    port: Port.tcp(3306),
+                    description: "MySQL",
+                },
+            ]),
+        };
+    }
+
+    createSecurityGroup(
+        name: string,
+        ingressRules: { peer: IPeer; port: Port; description: string }[],
+        description?: string
+    ) {
+        const securityGroup = new SecurityGroup(this, name + "SecurityGroup", {
             vpc: this.vpc,
+            securityGroupName: name,
+            description: description,
         });
 
-        // Create security group.
-        const web_server_sg = new SecurityGroup(
-            this,
-            "WebServerSecurityGroup",
-            {
-                vpc: this.vpc,
-                securityGroupName: "WebServer",
-            }
-        );
+        for (const rule of ingressRules) {
+            securityGroup.addIngressRule(
+                rule.peer,
+                rule.port,
+                rule.description
+            );
+        }
 
-        // Add ingress rule to security group.
-        web_server_sg.addIngressRule(
-            Peer.anyIpv4(),
-            Port.tcp(80),
-            "HTTP"
-        );
-
-        // Add ingress rule to security group.
-        web_server_sg.addIngressRule(
-            Peer.anyIpv4(),
-            Port.tcp(443),
-            "HTTPS"
-        );
-
-        // Define security groups.
-        this.security_groups = {
-            WEBSERVER: web_server_sg,
-        };
+        return securityGroup;
     }
 }
