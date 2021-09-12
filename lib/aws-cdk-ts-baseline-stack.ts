@@ -1,10 +1,16 @@
 import * as cdk from "@aws-cdk/core";
+import { IamStack } from "./iam-stack";
 import { RdsStack } from "./rds-stack";
 import { VpcStack } from "./vpc-stack";
 
 export class AwsCdkTsBaselineStack extends cdk.Stack {
     constructor(scope: cdk.Construct, id: string, props?: cdk.StackProps) {
         super(scope, id, props);
+
+        // Create IAM stack.
+        const iamStack = new IamStack(this, "IamStack", {
+            env: props?.env,
+        });
 
         // Create VPC stack.
         const vpcStack = new VpcStack(this, "VpcStack", {
@@ -14,6 +20,6 @@ export class AwsCdkTsBaselineStack extends cdk.Stack {
         // Create RDS stack.
         new RdsStack(this, "RdsStack", vpcStack, {
             env: props?.env,
-        })
+        });
     }
 }
