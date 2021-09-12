@@ -16,13 +16,10 @@ export class VpcStack extends cdk.Stack {
     constructor(scope: cdk.Construct, id: string, props?: cdk.StackProps) {
         super(scope, id, props);
 
-        // Define CIDR for VPC.
-        const cidr = "172.16.0.0/16";
-
         // Create VPC.
         this.vpc = new Vpc(this, "Vpc", {
             maxAzs: 2,
-            cidr: cidr,
+            cidr: "172.16.0.0/16",
             subnetConfiguration: [
                 {
                     cidrMask: 24,
@@ -66,7 +63,7 @@ export class VpcStack extends cdk.Stack {
         // Add security group to VPC.
         this.addSecurityGroupToVpc("MySqlServer", [
             {
-                peer: Peer.ipv4(cidr),
+                peer: Peer.ipv4(this.vpc.vpcCidrBlock),
                 port: Port.tcp(3306),
                 description: "MySQL",
             },
