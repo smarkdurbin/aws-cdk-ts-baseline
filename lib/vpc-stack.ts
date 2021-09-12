@@ -7,6 +7,7 @@ import {
     SubnetType,
     Vpc,
 } from "@aws-cdk/aws-ec2";
+import { group } from "console";
 
 export class VpcStack extends cdk.Stack {
     public readonly vpc: Vpc;
@@ -26,13 +27,13 @@ export class VpcStack extends cdk.Stack {
                 {
                     cidrMask: 24,
                     name: "Reserved",
-                    reserved: true,
+                    reserved: true, // Reserving first /24 of CIDR.
                     subnetType: SubnetType.PRIVATE_ISOLATED,
                 },
                 {
                     cidrMask: 24,
                     name: "Reserved",
-                    reserved: true,
+                    reserved: true, // Reserving second /24 of CIDR.
                     subnetType: SubnetType.PRIVATE_ISOLATED,
                 },
                 {
@@ -48,41 +49,52 @@ export class VpcStack extends cdk.Stack {
             ],
         });
 
-        // Define security groups.
-        this.securityGroups = {
-            WEBSERVER: this.createSecurityGroup("WebServer", [
-                {
-                    peer: Peer.anyIpv4(),
-                    port: Port.tcp(80),
-                    description: "HTTP",
-                },
-                {
-                    peer: Peer.anyIpv4(),
-                    port: Port.tcp(443),
-                    description: "HTTPS",
-                },
-            ]),
-            MYSQL: this.createSecurityGroup("MySqlServer", [
-                {
-                    peer: Peer.ipv4(cidr),
-                    port: Port.tcp(3306),
-                    description: "MySQL",
-                },
-            ]),
-        };
+        // Add security group to VPC.
+        this.addSecurityGroupToVpc("WebServer", [
+            {
+                peer: Peer.anyIpv4(),
+                port: Port.tcp(80),
+                description: "HTTP",
+            },
+            {
+                peer: Peer.anyIpv4(),
+                port: Port.tcp(443),
+                description: "HTTPS",
+            },
+        ]);
+
+        // Add security group to VPC.
+        this.addSecurityGroupToVpc("MySqlServer", [
+            {
+                peer: Peer.ipv4(cidr),
+                port: Port.tcp(3306),
+                description: "MySQL",
+            },
+        ]);
     }
 
-    createSecurityGroup(
+    /**
+     * Adds a security group for the VPC created in this class.
+     *
+     * @param name Name of the security group.
+     * @param ingressRules Ingress rulesfor the security group.
+     * @param description Description of the security group.
+     * @returns void
+     */
+    addSecurityGroupToVpc(
         name: string,
-        ingressRules: { peer: IPeer; port: Port; description: string }[],
+        ingressRules: { peer: IPeer; port: Port; description: string }[] = [],
+        egressRules: { peer: IPeer; port: Port; description: string }[] = [],
         description?: string
     ) {
+        // Create security group.
         const securityGroup = new SecurityGroup(this, name + "SecurityGroup", {
             vpc: this.vpc,
             securityGroupName: name,
             description: description,
         });
 
+        // Add ingress rules to security group.
         for (const rule of ingressRules) {
             securityGroup.addIngressRule(
                 rule.peer,
@@ -91,6 +103,16 @@ export class VpcStack extends cdk.Stack {
             );
         }
 
-        return securityGroup;
+        // Add egress rules to security group.
+        for (const rule of egressRules) {
+            securityGroup.addEgressRule(
+                rule.peer,
+                rule.port,
+                rule.description
+            );
+        }
+
+        // Add security group to class attribute, with uppercase key.
+        this.securityGroups[name.toUpperCase()] = securityGroup;
     }
 }
