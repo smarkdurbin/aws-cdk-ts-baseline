@@ -17,7 +17,7 @@ export class IamStack extends cdk.Stack {
         this.addRole("WebServer", new ServicePrincipal("ec2.amazonaws.com"));
 
         // Add instance profile.
-        this.addInstanceProfile("WebServer", [this.roles.WEBSERVER.roleArn]);
+        this.addInstanceProfile("WebServer", [this.roles.WEBSERVER.roleName]);
     }
 
     /**
