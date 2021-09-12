@@ -7,8 +7,8 @@ import {
 } from "@aws-cdk/aws-iam";
 
 export class IamStack extends cdk.Stack {
-    roles: { [key: string]: Role } = {};
-    instanceProfiles: { [key: string]: CfnInstanceProfile } = {};
+    public readonly roles: { [key: string]: Role } = {};
+    public readonly instanceProfiles: { [key: string]: CfnInstanceProfile } = {};
 
     constructor(scope: cdk.Construct, id: string, props?: cdk.StackProps) {
         super(scope, id, props);
