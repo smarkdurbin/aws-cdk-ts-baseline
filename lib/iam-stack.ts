@@ -20,6 +20,12 @@ export class IamStack extends cdk.Stack {
         this.addInstanceProfile("WebServer", [this.roles.WEBSERVER]);
     }
 
+    /**
+     * Adds an IAM role.
+     * 
+     * @param name Name of the IAM role.
+     * @param assumedBy AWS service principal to which the role is granted permission.
+     */
     addRole(name: string, assumedBy: ServicePrincipal) {
         const role = new Role(this, name + "Role", {
             roleName: name,
@@ -38,6 +44,12 @@ export class IamStack extends cdk.Stack {
         this.roles[name.toUpperCase()] = role;
     }
 
+    /**
+     * Adds an IAM instance profile.
+     * 
+     * @param name Name of the instance profile.
+     * @param roles Roles to add to the instance profile.
+     */
     addInstanceProfile(name: string, roles: Role[]) {
         const instanceProfile = new CfnInstanceProfile(
             this,
