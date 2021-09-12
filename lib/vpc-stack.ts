@@ -7,7 +7,6 @@ import {
     SubnetType,
     Vpc,
 } from "@aws-cdk/aws-ec2";
-import { group } from "console";
 
 export class VpcStack extends cdk.Stack {
     public readonly vpc: Vpc;
