@@ -1,10 +1,10 @@
+import * as cdk from "@aws-cdk/core";
 import {
     CfnInstanceProfile,
     ManagedPolicy,
     Role,
     ServicePrincipal,
 } from "@aws-cdk/aws-iam";
-import * as cdk from "@aws-cdk/core";
 
 export class IamStack extends cdk.Stack {
     roles: { [key: string]: Role } = {};
