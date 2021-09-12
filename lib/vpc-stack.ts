@@ -10,7 +10,7 @@ import {
 
 export class VpcStack extends cdk.Stack {
     public readonly vpc: Vpc;
-    public readonly securityGroups: { [key: string]: SecurityGroup };
+    public readonly securityGroups: { [key: string]: SecurityGroup } = {};
 
     constructor(scope: cdk.Construct, id: string, props?: cdk.StackProps) {
         super(scope, id, props);
