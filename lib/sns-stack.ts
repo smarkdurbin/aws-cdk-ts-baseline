@@ -1,5 +1,6 @@
 import * as cdk from "@aws-cdk/core";
 import { Subscription, SubscriptionProtocol, Topic } from "@aws-cdk/aws-sns";
+import config from "../config/config";
 
 export class SnsStack extends cdk.Stack {
     public readonly topics: { [key: string]: Topic } = {};
@@ -12,11 +13,11 @@ export class SnsStack extends cdk.Stack {
         this.addTopic("AccountNotifications");
 
         // Add SNS subscription.
-        this.addSubscription(
+        config.ACCOUNT_NOTIFCATIONS_EMAIL && this.addSubscription(
             "AccountNotifications",
             this.topics.ACCOUNTNOTIFICATIONS,
             SubscriptionProtocol.EMAIL,
-            "testemail@testemails.com"
+            config.ACCOUNT_NOTIFCATIONS_EMAIL
         );
     }
 
