@@ -19,7 +19,7 @@ export class RdsStack extends cdk.Stack {
         this.vpcStack = vpcStack;
 
         // Add subnet group.
-        this.addSubnetGroup("Private", SubnetType.PRIVATE_ISOLATED);
+        this.addSubnetGroup("Private", SubnetType.PRIVATE_ISOLATED, "Private, isolated subnets from " + vpcStack.vpc.vpcId);
     }
 
     /**
@@ -29,10 +29,10 @@ export class RdsStack extends cdk.Stack {
      * @param subnetType Type of subnets to add to group.
      * @param description Description of subnet group.
      */
-    addSubnetGroup(name: string, subnetType: SubnetType, description?: string) {
+    addSubnetGroup(name: string, subnetType: SubnetType, description: string) {
         const subnetGroup = new SubnetGroup(this, name + "SubnetGroup", {
             subnetGroupName: name,
-            description: "",
+            description: description,
             vpc: this.vpcStack.vpc,
             vpcSubnets: {
                 subnetType: subnetType,
