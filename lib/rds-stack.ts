@@ -24,18 +24,21 @@ export class RdsStack extends cdk.Stack {
 
     /**
      * Adds a subnet group to VPC in VPC stack.
-     * 
+     *
      * @param name Name of subnet group.
      * @param subnetType Type of subnets to add to group.
      * @param description Description of subnet group.
      */
-    addSubnetGroup(name: string, subnetType: SubnetType, description?: string ) {
-        const subnetGroup = new SubnetGroup(this, name + 'SubnetGroup', {
+    addSubnetGroup(name: string, subnetType: SubnetType, description?: string) {
+        const subnetGroup = new SubnetGroup(this, name + "SubnetGroup", {
             description: "",
             vpc: this.vpcStack.vpc,
             vpcSubnets: {
-                subnetType: subnetType
-            }
-        })
+                subnetType: subnetType,
+            },
+        });
+
+        // Add subnet group to class attribute, with uppercase key.
+        this.subnetGroups[name.toUpperCase()] = subnetGroup;
     }
 }
